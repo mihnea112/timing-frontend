@@ -1,24 +1,23 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+// App.tsx
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import AdminPage from "./pages/Adminpage";
+import RacersPage from "./pages/Racerspage";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="bg-gray-900 min-h-screen text-white">
+      <Router>
+        <div className="p-4 max-w-6xl mx-auto">
+          <nav className="flex gap-4 mb-6 text-lg font-semibold text-blue-400">
+            <Link to="/">🏁 Sectiune administatior</Link>
+            <Link to="/racers">📊 Panou Timpi</Link>
+          </nav>
+          <Routes>
+            <Route path="/" element={<AdminPage />} />
+            <Route path="/racers" element={<RacersPage />} />
+          </Routes>
+        </div>
+      </Router>
     </div>
   );
 }
