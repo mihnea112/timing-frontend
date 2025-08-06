@@ -40,9 +40,7 @@ export default function AdminPage() {
     value: number
   ) => {
     const payload =
-      field === "penalty_ms"
-        ? { [field]: value * 1000 }
-        : { [field]: value };
+      field === "penalty_ms" ? { [field]: value * 1000 } : { [field]: value };
 
     await fetch(`${process.env.REACT_APP_API_URL}/api/time/${id}/${field}`, {
       method: "PATCH",
@@ -117,23 +115,29 @@ export default function AdminPage() {
 
   // If logged in, show admin panel
   return (
-    <div className="space-y-6 p-4">
-      <h1 className="text-2xl font-bold text-white">🏁 Admin Dashboard</h1>
-      <table className="w-full table-auto text-left border-collapse text-white">
-        <thead>
-          <tr className="border-b border-gray-600">
-            <th className="p-2">ID</th>
-            <th className="p-2">Timp Mansa</th>
-            <th className="p-2">Car #</th>
-            <th className="p-2">Penalizare (s)</th>
-            <th className="p-2">Mansa</th>
-            <th className="p-2">Timp final</th>
-          </tr>
-        </thead>
-        <tbody>
-          {entries.map((entry) => {
-            return (
-              <tr key={entry.id} className="border-b border-gray-800">
+    <div className="px-4 py-6 space-y-6">
+      <h1 className="text-xl sm:text-2xl font-bold text-white">
+        🏁 Admin Dashboard
+      </h1>
+
+      <div className="overflow-x-auto">
+        <table className="min-w-[800px] sm:min-w-full w-full table-auto text-left border-collapse text-white">
+          <thead>
+            <tr className="border-b border-gray-600 text-sm sm:text-base">
+              <th className="p-2">ID</th>
+              <th className="p-2">Timp Mansa</th>
+              <th className="p-2">Car #</th>
+              <th className="p-2">Penalizare (s)</th>
+              <th className="p-2">Mansa</th>
+              <th className="p-2">Timp final</th>
+            </tr>
+          </thead>
+          <tbody>
+            {entries.map((entry) => (
+              <tr
+                key={entry.id}
+                className="border-b border-gray-800 text-sm sm:text-base"
+              >
                 <td className="p-2">{entry.id}</td>
                 <td className="p-2">{formatTime(entry.time_ms)}</td>
                 <td className="p-2">
@@ -142,7 +146,11 @@ export default function AdminPage() {
                     className="bg-gray-800 border border-gray-700 px-2 py-1 rounded text-white w-20"
                     value={entry.car_number ?? ""}
                     onChange={(e) =>
-                      updateCar(entry.id, "car_number", parseInt(e.target.value))
+                      updateCar(
+                        entry.id,
+                        "car_number",
+                        parseInt(e.target.value)
+                      )
                     }
                   />
                 </td>
@@ -152,7 +160,11 @@ export default function AdminPage() {
                     className="bg-gray-800 border border-gray-700 px-2 py-1 rounded text-white w-20"
                     value={entry.penalty_ms / 1000}
                     onChange={(e) =>
-                      updateCar(entry.id, "penalty_ms", parseInt(e.target.value))
+                      updateCar(
+                        entry.id,
+                        "penalty_ms",
+                        parseInt(e.target.value)
+                      )
                     }
                   />
                 </td>
@@ -173,10 +185,10 @@ export default function AdminPage() {
                   {formatTime(entry.time_ms + entry.penalty_ms)}
                 </td>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

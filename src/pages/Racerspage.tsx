@@ -66,50 +66,56 @@ export default function RacersPage() {
   });
 
   return (
-    <div className="p-4 space-y-6 text-white">
-      <h1 className="text-2xl font-bold">🏎️ Panou Timpi</h1>
-      <table className="w-full table-auto text-left border-collapse">
-        <thead>
-          <tr className="border-b border-gray-600">
-            <th className="p-2">Numar Concurs #</th>
-            <th className="p-2">Timp Mansa 1</th>
-            <th className="p-2">Penalizare Mansa 1</th>
-            <th className="p-2">Total Mansa 1</th>
-            <th className="p-2">Timp Mansa 2</th>
-            <th className="p-2">Penalizare Mansa 2</th>
-            <th className="p-2">Total Mansa 2</th>
-            <th className="p-2">Timp Final</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sorted.map((entry) => {
-            const stage1 = (entry.stages[1] || 0) + (entry.penalties[1] || 0);
-            const stage2 = (entry.stages[2] || 0) + (entry.penalties[2] || 0);
-            let total = 0;
-            if (stage1 > 0 && stage2 > 0) {
-              total = Math.min(stage1, stage2);
-            } else if (stage1 > 0) {
-              total = stage1;
-            } else if (stage2 > 0) {
-              total = stage2;
-            } else {
-              total = 0; // or keep empty if you want
-            }
-            return (
-              <tr key={entry.car_number} className="border-b border-gray-800">
-                <td className="p-2">{entry.car_number}</td>
-                <td className="p-2">{formatTime(entry.stages[1] || 0)}</td>
-                <td className="p-2">{formatTime(entry.penalties[1] || 0)}</td>
-                <td className="p-2">{formatTime(stage1)}</td>
-                <td className="p-2">{formatTime(entry.stages[2] || 0)}</td>
-                <td className="p-2">{formatTime(entry.penalties[2] || 0)}</td>
-                <td className="p-2">{formatTime(stage2)}</td>
-                <td className="p-2 font-bold">{formatTime(total)}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+    <div className="px-4 py-6 space-y-6 text-white">
+      <h1 className="text-xl sm:text-2xl font-bold">🏎️ Panou Timpi</h1>
+
+      <div className="overflow-x-auto">
+        <table className="min-w-[700px] sm:min-w-full w-full table-auto text-left border-collapse">
+          <thead>
+            <tr className="border-b border-gray-600 text-sm sm:text-base">
+              <th className="p-2">Numar Concurs #</th>
+              <th className="p-2">Timp Mansa 1</th>
+              <th className="p-2">Penalizare Mansa 1</th>
+              <th className="p-2">Total Mansa 1</th>
+              <th className="p-2">Timp Mansa 2</th>
+              <th className="p-2">Penalizare Mansa 2</th>
+              <th className="p-2">Total Mansa 2</th>
+              <th className="p-2">Timp Final</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.map((entry) => {
+              const stage1 = (entry.stages[1] || 0) + (entry.penalties[1] || 0);
+              const stage2 = (entry.stages[2] || 0) + (entry.penalties[2] || 0);
+              let total = 0;
+              if (stage1 > 0 && stage2 > 0) {
+                total = Math.min(stage1, stage2);
+              } else if (stage1 > 0) {
+                total = stage1;
+              } else if (stage2 > 0) {
+                total = stage2;
+              } else {
+                total = 0;
+              }
+              return (
+                <tr
+                  key={entry.car_number}
+                  className="border-b border-gray-800 text-sm sm:text-base"
+                >
+                  <td className="p-2">{entry.car_number}</td>
+                  <td className="p-2">{formatTime(entry.stages[1] || 0)}</td>
+                  <td className="p-2">{formatTime(entry.penalties[1] || 0)}</td>
+                  <td className="p-2">{formatTime(stage1)}</td>
+                  <td className="p-2">{formatTime(entry.stages[2] || 0)}</td>
+                  <td className="p-2">{formatTime(entry.penalties[2] || 0)}</td>
+                  <td className="p-2">{formatTime(stage2)}</td>
+                  <td className="p-2 font-bold">{formatTime(total)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
