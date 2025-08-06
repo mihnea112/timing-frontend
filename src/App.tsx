@@ -7,7 +7,7 @@ function App() {
   return (
     <div className="bg-gray-900 min-h-screen text-white">
       <Router>
-        <div className="p-4 max-w-6xl mx-auto">
+        <div className="p-4 max-w-8xl mx-auto">
           <nav className="flex gap-4 mb-6 text-lg font-semibold text-blue-400">
             <Link to="/">🏁 Sectiune administatior</Link>
             <Link to="/racers">📊 Panou Timpi</Link>

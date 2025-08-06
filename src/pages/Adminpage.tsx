@@ -9,8 +9,24 @@ interface TimeEntry {
   created_at: string;
 }
 
+// Hardcoded login credentials for local use only
+const ADMIN_USERNAME = "admin";
+const ADMIN_PASSWORD = "racing123";
+
 export default function AdminPage() {
   const [entries, setEntries] = useState<TimeEntry[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      setIsLoggedIn(true);
+    } else {
+      alert("Invalid credentials");
+    }
+  };
 
   const fetchData = () => {
     fetch(`${process.env.REACT_APP_API_URL}/api/times`)
@@ -25,7 +41,7 @@ export default function AdminPage() {
   ) => {
     const payload =
       field === "penalty_ms"
-        ? { [field]: value * 1000 } // store penalty in ms, input in seconds
+        ? { [field]: value * 1000 }
         : { [field]: value };
 
     await fetch(`${process.env.REACT_APP_API_URL}/api/time/${id}/${field}`, {
@@ -35,6 +51,7 @@ export default function AdminPage() {
     });
     fetchData();
   };
+
   const updateStage = async (id: number, stage: number) => {
     await fetch(`${process.env.REACT_APP_API_URL}/api/time/${id}/stage`, {
       method: "PATCH",
@@ -43,11 +60,13 @@ export default function AdminPage() {
     });
     fetchData();
   };
+
   useEffect(() => {
+    if (!isLoggedIn) return;
     fetchData();
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isLoggedIn]);
 
   const formatTime = (ms: number) => {
     const minutes = Math.floor(ms / 60000);
@@ -56,6 +75,47 @@ export default function AdminPage() {
     return `${minutes}m ${seconds}s ${millis}ms`;
   };
 
+  // If not logged in, show login form
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <form
+          onSubmit={handleLogin}
+          className="bg-gray-900 p-6 rounded shadow-md space-y-4 w-80"
+        >
+          <h2 className="text-xl font-bold">🔐 Admin Login</h2>
+          <div>
+            <label className="block text-sm">Username</label>
+            <input
+              type="text"
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm">Password</label>
+            <input
+              type="password"
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded text-white font-semibold"
+          >
+            Login
+          </button>
+        </form>
+      </div>
+    );
+  }
+
+  // If logged in, show admin panel
   return (
     <div className="space-y-6 p-4">
       <h1 className="text-2xl font-bold text-white">🏁 Admin Dashboard</h1>
@@ -65,7 +125,7 @@ export default function AdminPage() {
             <th className="p-2">ID</th>
             <th className="p-2">Timp Mansa</th>
             <th className="p-2">Car #</th>
-            <th className="p-2">Penalty (s)</th>
+            <th className="p-2">Penalizare (s)</th>
             <th className="p-2">Mansa</th>
             <th className="p-2">Timp final</th>
           </tr>
@@ -82,11 +142,7 @@ export default function AdminPage() {
                     className="bg-gray-800 border border-gray-700 px-2 py-1 rounded text-white w-20"
                     value={entry.car_number ?? ""}
                     onChange={(e) =>
-                      updateCar(
-                        entry.id,
-                        "car_number",
-                        parseInt(e.target.value)
-                      )
+                      updateCar(entry.id, "car_number", parseInt(e.target.value))
                     }
                   />
                 </td>
@@ -96,11 +152,7 @@ export default function AdminPage() {
                     className="bg-gray-800 border border-gray-700 px-2 py-1 rounded text-white w-20"
                     value={entry.penalty_ms / 1000}
                     onChange={(e) =>
-                      updateCar(
-                        entry.id,
-                        "penalty_ms",
-                        parseInt(e.target.value)
-                      )
+                      updateCar(entry.id, "penalty_ms", parseInt(e.target.value))
                     }
                   />
                 </td>

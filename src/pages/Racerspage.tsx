@@ -67,13 +67,17 @@ export default function RacersPage() {
 
   return (
     <div className="p-4 space-y-6 text-white">
-      <h1 className="text-2xl font-bold">🏎️ Racer Standings</h1>
+      <h1 className="text-2xl font-bold">🏎️ Panou Timpi</h1>
       <table className="w-full table-auto text-left border-collapse">
         <thead>
           <tr className="border-b border-gray-600">
-            <th className="p-2">Car #</th>
-            <th className="p-2">Mansa 1</th>
-            <th className="p-2">Mansa 2</th>
+            <th className="p-2">Numar Concurs #</th>
+            <th className="p-2">Timp Mansa 1</th>
+            <th className="p-2">Penalizare Mansa 1</th>
+            <th className="p-2">Total Mansa 1</th>
+            <th className="p-2">Timp Mansa 2</th>
+            <th className="p-2">Penalizare Mansa 2</th>
+            <th className="p-2">Total Mansa 2</th>
             <th className="p-2">Timp Final</th>
           </tr>
         </thead>
@@ -94,9 +98,13 @@ export default function RacersPage() {
             return (
               <tr key={entry.car_number} className="border-b border-gray-800">
                 <td className="p-2">{entry.car_number}</td>
+                <td className="p-2">{formatTime(entry.stages[1] || 0)}</td>
+                <td className="p-2">{formatTime(entry.penalties[1] || 0)}</td>
                 <td className="p-2">{formatTime(stage1)}</td>
+                <td className="p-2">{formatTime(entry.stages[2] || 0)}</td>
+                <td className="p-2">{formatTime(entry.penalties[2] || 0)}</td>
                 <td className="p-2">{formatTime(stage2)}</td>
-                <td className="p-2 font-semibold">{formatTime(total)}</td>
+                <td className="p-2 font-bold">{formatTime(total)}</td>
               </tr>
             );
           })}
