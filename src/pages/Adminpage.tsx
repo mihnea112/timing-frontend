@@ -13,7 +13,7 @@ export default function AdminPage() {
   const [entries, setEntries] = useState<TimeEntry[]>([]);
 
   const fetchData = () => {
-    fetch("http://192.168.0.142:3001/api/times")
+    fetch(`${process.env.REACT_APP_API_URL}/api/times`)
       .then((res) => res.json())
       .then((data) => setEntries(data));
   };
@@ -28,7 +28,7 @@ export default function AdminPage() {
         ? { [field]: value * 1000 } // store penalty in ms, input in seconds
         : { [field]: value };
 
-    await fetch(`http://192.168.0.142:3001/api/time/${id}/${field}`, {
+    await fetch(`${process.env.REACT_APP_API_URL}/api/time/${id}/${field}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -36,7 +36,7 @@ export default function AdminPage() {
     fetchData();
   };
   const updateStage = async (id: number, stage: number) => {
-    await fetch(`http://192.168.0.142:3001/api/time/${id}/stage`, {
+    await fetch(`${process.env.REACT_APP_API_URL}/api/time/${id}/stage`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ stage }),

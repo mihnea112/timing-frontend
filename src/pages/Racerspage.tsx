@@ -19,7 +19,7 @@ export default function RacersPage() {
   const [entries, setEntries] = useState<TimeEntry[]>([]);
 
   const fetchData = () => {
-    fetch("http://192.168.0.142:3001/api/times")
+    fetch(`${process.env.REACT_APP_API_URL}/api/times`)
       .then((res) => res.json())
       .then((data) => setEntries(data));
   };
