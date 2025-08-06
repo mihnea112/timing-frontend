@@ -7,9 +7,9 @@ function App() {
   return (
     <div className="bg-gray-900 min-h-screen text-white">
       <Router>
-        <div className="p-4 max-w-8xl mx-auto">
-          <nav className="flex gap-4 mb-6 text-lg font-semibold text-blue-400">
-            <Link to="/">🏁 Sectiune administatior</Link>
+        <div className="px-4 py-6 sm:px-6 lg:px-8 max-w-screen-xl mx-auto">
+          <nav className="flex flex-col sm:flex-row sm:gap-6 gap-2 mb-6 text-base sm:text-lg font-semibold text-blue-400">
+            <Link to="/">🏁 Sectiune administrator</Link>
             <Link to="/racers">📊 Panou Timpi</Link>
           </nav>
           <Routes>
