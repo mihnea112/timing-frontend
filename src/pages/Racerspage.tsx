@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 interface TimeEntry {
   id: number;
@@ -70,7 +70,7 @@ export default function RacersPage() {
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(18);
-    doc.text("🏎️ Panou Timpi", 14, 20);
+    doc.text("Panou Timpi Becicherec", 14, 20);
 
     const tableColumn = [
       "Numar Concurs #",
@@ -107,8 +107,7 @@ export default function RacersPage() {
       ];
     });
 
-    // @ts-ignore
-    doc.autoTable({
+    autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
       startY: 30,
