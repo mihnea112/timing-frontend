@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 interface TimeEntry {
   id: number;
@@ -33,7 +35,7 @@ export default function RacersPage() {
   const formatTime = (ms: number) => {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
-    const millis = ms % 1000;
+    const millis = ms % 100;
     return `${minutes}m ${seconds}s ${millis}ms`;
   };
 
@@ -65,9 +67,66 @@ export default function RacersPage() {
     return aTotal - bTotal;
   });
 
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text("🏎️ Panou Timpi", 14, 20);
+
+    const tableColumn = [
+      "Numar Concurs #",
+      "Timp Mansa 1",
+      "Penalizare Mansa 1",
+      "Total Mansa 1",
+      "Timp Mansa 2",
+      "Penalizare Mansa 2",
+      "Total Mansa 2",
+      "Timp Final",
+    ];
+
+    const tableRows = sorted.map((entry) => {
+      const stage1 = (entry.stages[1] || 0) + (entry.penalties[1] || 0);
+      const stage2 = (entry.stages[2] || 0) + (entry.penalties[2] || 0);
+      let total = 0;
+      if (stage1 > 0 && stage2 > 0) {
+        total = Math.min(stage1, stage2);
+      } else if (stage1 > 0) {
+        total = stage1;
+      } else if (stage2 > 0) {
+        total = stage2;
+      }
+
+      return [
+        entry.car_number,
+        formatTime(entry.stages[1] || 0),
+        formatTime(entry.penalties[1] || 0),
+        formatTime(stage1),
+        formatTime(entry.stages[2] || 0),
+        formatTime(entry.penalties[2] || 0),
+        formatTime(stage2),
+        formatTime(total),
+      ];
+    });
+
+    // @ts-ignore
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 30,
+    });
+
+    doc.save("panou_timpi.pdf");
+  };
+
   return (
     <div className="px-4 py-6 space-y-6 text-white">
       <h1 className="text-xl sm:text-2xl font-bold">🏎️ Panou Timpi</h1>
+
+      <button
+        onClick={exportToPDF}
+        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+      >
+        Export to PDF
+      </button>
 
       <div className="overflow-x-auto">
         <table className="min-w-[700px] sm:min-w-full w-full table-auto text-left border-collapse">

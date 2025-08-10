@@ -69,7 +69,7 @@ export default function AdminPage() {
   const formatTime = (ms: number) => {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
-    const millis = ms % 1000;
+    const millis = ms % 100;
     return `${minutes}m ${seconds}s ${millis}ms`;
   };
 
