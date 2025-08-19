@@ -3,10 +3,20 @@ import { useEffect, useState } from "react";
 interface TimeEntry {
   id: number;
   time_ms: number;
-  car_number: number | null;
+  racer_id: number | null;
+  name?: string;
+  car_number?: number;
+  category?: string;
   penalty_ms: number;
   stage: number | null;
   created_at: string;
+}
+
+interface Racer {
+  id: number;
+  name: string;
+  car_number: number;
+  category: string;
 }
 
 // Hardcoded login credentials for local use only
@@ -15,6 +25,7 @@ const ADMIN_PASSWORD = "racing123";
 
 export default function AdminPage() {
   const [entries, setEntries] = useState<TimeEntry[]>([]);
+  const [racers, setRacers] = useState<Racer[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -29,16 +40,29 @@ export default function AdminPage() {
   };
 
   const fetchData = () => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/times`)
-      .then((res) => res.json())
-      .then((data) => setEntries(data));
+    Promise.all([
+      fetch(`${process.env.REACT_APP_API_URL}/api/times`).then((res) =>
+        res.json()
+      ),
+      fetch(`${process.env.REACT_APP_API_URL}/api/racers`).then((res) =>
+        res.json()
+      ),
+    ]).then(([timesData, racersData]) => {
+      setEntries(timesData);
+      setRacers(racersData);
+    });
   };
 
-  const updateCar = async (
-    id: number,
-    field: "car_number" | "penalty_ms",
-    value: number
-  ) => {
+  const updateRacer = async (id: number, racer_id: number) => {
+    await fetch(`${process.env.REACT_APP_API_URL}/api/time/${id}/racer`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ racer_id }),
+    });
+    fetchData();
+  };
+
+  const updateCar = async (id: number, field: "penalty_ms", value: number) => {
     const payload =
       field === "penalty_ms" ? { [field]: value * 1000 } : { [field]: value };
 
@@ -127,6 +151,8 @@ export default function AdminPage() {
               <th className="p-2">ID</th>
               <th className="p-2">Timp Mansa</th>
               <th className="p-2">Car #</th>
+              <th className="p-2">Nume Pilot</th>
+              <th className="p-2">Categorie</th>
               <th className="p-2">Penalizare (s)</th>
               <th className="p-2">Mansa</th>
               <th className="p-2">Timp final</th>
@@ -141,19 +167,23 @@ export default function AdminPage() {
                 <td className="p-2">{entry.id}</td>
                 <td className="p-2">{formatTime(entry.time_ms)}</td>
                 <td className="p-2">
-                  <input
-                    type="number"
-                    className="bg-gray-800 border border-gray-700 px-2 py-1 rounded text-white w-20"
-                    value={entry.car_number ?? ""}
+                  <select
+                    className="bg-gray-800 border border-gray-700 px-2 py-1 rounded text-white w-48"
+                    value={entry.racer_id ?? ""}
                     onChange={(e) =>
-                      updateCar(
-                        entry.id,
-                        "car_number",
-                        parseInt(e.target.value)
-                      )
+                      updateRacer(entry.id, parseInt(e.target.value))
                     }
-                  />
+                  >
+                    <option value="">--</option>
+                    {racers.map((racer) => (
+                      <option key={racer.id} value={racer.id}>
+                        {racer.car_number} - {racer.name} ({racer.category})
+                      </option>
+                    ))}
+                  </select>
                 </td>
+                <td className="p-2">{entry.name ?? ""}</td>
+                <td className="p-2">{entry.category ?? ""}</td>
                 <td className="p-2">
                   <input
                     type="number"

@@ -2,6 +2,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import AdminPage from "./pages/Adminpage";
 import RacersPage from "./pages/Racerspage";
+import AddRacer from "./pages/AddRacer";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Routes>
             <Route path="/" element={<AdminPage />} />
             <Route path="/racers" element={<RacersPage />} />
+            <Route path="/add-racers" element={<AddRacer />} />
           </Routes>
         </div>
       </Router>
