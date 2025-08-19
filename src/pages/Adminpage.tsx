@@ -4,7 +4,7 @@ interface TimeEntry {
   id: number;
   time_ms: number;
   racer_id: number | null;
-  name?: string;
+  racer_name?: string;
   car_number?: number;
   category?: string;
   penalty_ms: number;
@@ -182,7 +182,7 @@ export default function AdminPage() {
                     ))}
                   </select>
                 </td>
-                <td className="p-2">{entry.name ?? ""}</td>
+                <td className="p-2">{entry.racer_name ?? ""}</td>
                 <td className="p-2">{entry.category ?? ""}</td>
                 <td className="p-2">
                   <input
