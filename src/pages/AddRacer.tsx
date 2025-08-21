@@ -11,11 +11,10 @@ const categories = [
   "C1",
   "C2",
   "C3",
-  "Drift",
   "Karting",
   "Eco-Karting",
   "Juniori",
-  "Feminin",
+  "Forlighter",
 ];
 
 export default function AddRacersPage() {
