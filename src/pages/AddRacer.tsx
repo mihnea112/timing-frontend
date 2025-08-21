@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 interface Racer {
   id: number;
   name: string;
-  car_number: number;
+  car_number: string;
   category: string;
 }
 
@@ -21,7 +21,7 @@ const categories = [
 export default function AddRacersPage() {
   const [racers, setRacers] = useState<Racer[]>([]);
   const [name, setName] = useState("");
-  const [carNumber, setCarNumber] = useState<number | "">("");
+  const [carNumber, setCarNumber] = useState<string>("");
   const [category, setCategory] = useState(categories[0]);
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
@@ -54,7 +54,7 @@ export default function AddRacersPage() {
         },
         body: JSON.stringify({
           name: name,
-          car_number: Number(carNumber),
+          car_number: carNumber,
           category: category,
         }),
       });
@@ -176,10 +176,10 @@ export default function AddRacersPage() {
             className="px-3 py-2 rounded bg-gray-700 text-white flex-1"
           />
           <input
-            type="number"
+            type="text"
             placeholder="Car Number"
             value={carNumber}
-            onChange={(e) => setCarNumber(Number(e.target.value))}
+            onChange={(e) => setCarNumber(e.target.value)}
             className="px-3 py-2 rounded bg-gray-700 text-white w-32"
           />
           <select
