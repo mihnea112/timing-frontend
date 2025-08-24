@@ -9,7 +9,7 @@ interface TimeEntry {
   stage: number | null;
   racer_id: number;
   racer_name: string;
-  car_number: number | null;
+  car_number: string | null;
   category: string;
   created_at: string;
 }
@@ -17,7 +17,7 @@ interface TimeEntry {
 interface GroupedEntry {
   racer_id: number;
   racer_name: string;
-  car_number: number | null;
+  car_number: string | null;
   category: string;
   stages: { [stage: number]: number };
   penalties: { [stage: number]: number };
@@ -48,6 +48,23 @@ export default function RacersPage() {
     return `${minutes}m ${seconds}s ${millis}ms`;
   };
 
+  // Best valid total for sorting: pick the better (smaller) stage+penalty.
+  // Missing times (0/undefined) or Abandon (>= 480000 ms) are treated as Infinity.
+  const bestTotal = (e: GroupedEntry) => {
+    const s1 = (e.stages[1] ?? 0) + (e.penalties[1] ?? 0);
+    const s2 = (e.stages[2] ?? 0) + (e.penalties[2] ?? 0);
+
+    const normalize = (t: number) => {
+      if (!t) return Number.POSITIVE_INFINITY;
+      if (t >= 480000) return Number.POSITIVE_INFINITY;
+      return t;
+    };
+
+    const t1 = normalize(s1);
+    const t2 = normalize(s2);
+    return Math.min(t1, t2);
+  };
+
   // Group entries by racer_id and accumulate stages and penalties
   const grouped: { [racerId: number]: GroupedEntry } = {};
   for (const entry of entries) {
@@ -75,27 +92,29 @@ export default function RacersPage() {
     groupedByCategory[racer.category].push(racer);
   }
 
-  // Sort racers within each category by their best total time (stage + penalty)
+  // Sort racers within each category by best (lowest) valid total.
+  // Missing/abandon runs are pushed to the end.
+  // Tie-break by car number (numeric) then by racer name.
   for (const category in groupedByCategory) {
     groupedByCategory[category].sort((a, b) => {
-      const aTotal =
-        (a.stages[1] || 0) +
-        (a.penalties[1] || 0) +
-        (a.stages[2] || 0) +
-        (a.penalties[2] || 0);
-      const bTotal =
-        (b.stages[1] || 0) +
-        (b.penalties[1] || 0) +
-        (b.stages[2] || 0) +
-        (b.penalties[2] || 0);
-      return aTotal - bTotal;
+      const ta = bestTotal(a);
+      const tb = bestTotal(b);
+
+      if (ta === tb) {
+        const aNum = a.car_number ? parseInt(a.car_number as string, 10) : Number.POSITIVE_INFINITY;
+        const bNum = b.car_number ? parseInt(b.car_number as string, 10) : Number.POSITIVE_INFINITY;
+        const byNum = aNum - bNum;
+        if (byNum !== 0) return byNum;
+        return a.racer_name.localeCompare(b.racer_name);
+      }
+      return ta - tb;
     });
   }
 
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(18);
-    doc.text("Panou Timpi Timisoara grand Prix", 14, 20);
+    doc.text("Panou Timpi Timisoara Grand Prix", 14, 20);
 
     const tableColumn = [
       "Nume Pilot",
