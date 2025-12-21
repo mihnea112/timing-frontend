@@ -25,6 +25,7 @@ interface GroupedEntry {
 
 export default function RacersPage() {
   const [entries, setEntries] = useState<TimeEntry[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   const fetchData = () => {
     fetch(`${process.env.REACT_APP_API_URL}/api/times`)
@@ -44,7 +45,7 @@ export default function RacersPage() {
     }
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
-    const millis = ms % 100;
+    const millis = ms % 1000;
     return `${minutes}m ${seconds}s ${millis}ms`;
   };
 
@@ -111,7 +112,14 @@ export default function RacersPage() {
     });
   }
 
-  const exportToPDF = () => {
+  useEffect(() => {
+    const categories = Object.keys(groupedByCategory);
+    if (categories.length > 0 && !activeCategory) {
+      setActiveCategory(categories[0]);
+    }
+  }, [entries]);
+
+  const exportCategoryToPDF = (category: string, racers: GroupedEntry[]) => {
     const doc = new jsPDF();
     doc.setFontSize(18);
     doc.text("Panou Timpi Timisoara Grand Prix", 14, 20);
@@ -130,65 +138,80 @@ export default function RacersPage() {
 
     let startY = 30;
 
-    for (const category of Object.keys(groupedByCategory)) {
-      doc.setFontSize(16);
-      doc.text(`Categorie: ${category}`, 14, startY);
-      startY += 8;
+    doc.setFontSize(16);
+    doc.text(`Categorie: ${category}`, 14, startY);
+    startY += 8;
 
-      const tableRows = groupedByCategory[category].map((entry) => {
-        const stage1 = (entry.stages[1] || 0) + (entry.penalties[1] || 0);
-        const stage2 = (entry.stages[2] || 0) + (entry.penalties[2] || 0);
-        let total = 0;
-        if (stage1 > 0 && stage2 > 0) {
-          total = Math.min(stage1, stage2);
-        } else if (stage1 > 0) {
-          total = stage1;
-        } else if (stage2 > 0) {
-          total = stage2;
-        }
+    const tableRows = racers.map((entry) => {
+      const stage1 = (entry.stages[1] || 0) + (entry.penalties[1] || 0);
+      const stage2 = (entry.stages[2] || 0) + (entry.penalties[2] || 0);
+      let total = 0;
+      if (stage1 > 0 && stage2 > 0) {
+        total = Math.min(stage1, stage2);
+      } else if (stage1 > 0) {
+        total = stage1;
+      } else if (stage2 > 0) {
+        total = stage2;
+      }
 
-        return [
-          entry.racer_name,
-          entry.car_number || "-",
-          formatTime(entry.stages[1] || 0),
-          formatTime(entry.penalties[1] || 0),
-          formatTime(stage1),
-          formatTime(entry.stages[2] || 0),
-          formatTime(entry.penalties[2] || 0),
-          formatTime(stage2),
-          formatTime(total),
-        ];
-      });
+      return [
+        entry.racer_name,
+        entry.car_number || "-",
+        formatTime(entry.stages[1] || 0),
+        formatTime(entry.penalties[1] || 0),
+        formatTime(stage1),
+        formatTime(entry.stages[2] || 0),
+        formatTime(entry.penalties[2] || 0),
+        formatTime(stage2),
+        formatTime(total),
+      ];
+    });
 
-      autoTable(doc, {
-        head: [tableColumn],
-        body: tableRows,
-        startY,
-        theme: "grid",
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [41, 128, 185] },
-      });
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY,
+      theme: "grid",
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [41, 128, 185] },
+    });
 
-      startY = (doc as any).lastAutoTable.finalY + 10;
-    }
-
-    doc.save("panou_timpi.pdf");
+    doc.save(`panou_timpi_${category}.pdf`);
   };
 
   return (
     <div className="px-4 py-6 space-y-6 text-white">
       <h1 className="text-xl sm:text-2xl font-bold">🏎️ Panou Timpi</h1>
 
-      <button
-        onClick={exportToPDF}
-        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-      >
-        Export to PDF
-      </button>
+      <div className="flex space-x-4 border-b border-gray-600">
+        {Object.keys(groupedByCategory).map((category) => (
+          <button
+            key={category}
+            onClick={() => setActiveCategory(category)}
+            className={`py-2 px-4 -mb-px border-b-2 font-semibold ${
+              activeCategory === category
+                ? "border-blue-600 text-blue-600"
+                : "border-transparent hover:text-blue-400"
+            }`}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
 
-      {Object.keys(groupedByCategory).map((category) => (
-        <div key={category}>
-          <h2 className="text-lg font-semibold mt-6 mb-2">{category}</h2>
+      {activeCategory && (
+        <div>
+          <div className="flex items-center justify-between mt-6 mb-2">
+            <h2 className="text-lg font-semibold">{activeCategory}</h2>
+            <button
+              onClick={() =>
+                exportCategoryToPDF(activeCategory, groupedByCategory[activeCategory])
+              }
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+            >
+              Export {activeCategory} to PDF
+            </button>
+          </div>
           <div className="overflow-x-auto">
             <table className="min-w-[700px] sm:min-w-full w-full table-auto text-left border-collapse">
               <thead>
@@ -205,7 +228,7 @@ export default function RacersPage() {
                 </tr>
               </thead>
               <tbody>
-                {groupedByCategory[category].map((entry) => {
+                {groupedByCategory[activeCategory].map((entry) => {
                   const stage1 = (entry.stages[1] || 0) + (entry.penalties[1] || 0);
                   const stage2 = (entry.stages[2] || 0) + (entry.penalties[2] || 0);
                   let total = 0;
@@ -239,7 +262,7 @@ export default function RacersPage() {
             </table>
           </div>
         </div>
-      ))}
+      )}
     </div>
   );
 }
