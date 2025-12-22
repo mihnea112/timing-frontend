@@ -74,12 +74,20 @@ export default function DashboardPage() {
               {user?.name || user?.email}
             </div>
           </div>
-          <button
-            onClick={logout}
-            className="px-4 py-2 rounded border border-neutral-800 hover:bg-neutral-900"
-          >
-            Logout
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/app/devices"
+              className="px-4 py-2 rounded border border-neutral-800 hover:bg-neutral-900"
+            >
+              Devices
+            </Link>
+            <button
+              onClick={logout}
+              className="px-4 py-2 rounded border border-neutral-800 hover:bg-neutral-900"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -163,7 +171,6 @@ export default function DashboardPage() {
                       >
                         Results
                       </Link>
-
 
                       <Link
                         to={`/app/events/${ev.id}/admin/racers`}

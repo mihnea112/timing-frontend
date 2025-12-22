@@ -11,6 +11,7 @@ import EventTimingPage from "./pages/EventTimingPage";
 import EventAdminTimesPage from "./pages/EventAdminTimesPage";
 import EventAdminRacersPage from "./pages/EventAdminRacersPage";
 import PublicResultsPage from "./pages/PublicResultsPage";
+import DevicesPage from "./pages/DevicesPage";
 
 export default function App() {
   return (
@@ -64,7 +65,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-
+          <Route path="/app/devices" element={<DevicesPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
