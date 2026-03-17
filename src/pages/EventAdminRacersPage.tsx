@@ -15,9 +15,14 @@ const categories = [
   "C1",
   "C2",
   "C3",
-  "Karting",
-  "Eco-Karting",
+  "Drift",
+  "Rally Cross",
   "Juniori",
+  "Feminin",
+  "Eco-Karting",
+  "Eco-Karting Juniori",
+  "Karting",
+  "Karting Juniori",
   "Forlighter",
 ];
 
