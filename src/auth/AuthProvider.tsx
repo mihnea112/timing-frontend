@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { api } from "../api/client";
 
 type User = { id: number; email: string; name?: string | null };
@@ -17,7 +17,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  async function loadMe() {
+  const loadMe = useCallback(async () => {
     try {
       const me = await api<User>("/api/me");
       setUser(me);
@@ -26,36 +26,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     loadMe();
-  }, []);
+  }, [loadMe]);
 
-  async function login(email: string, password: string) {
-    const { token } = await api<{ token: string }>("/api/auth/login", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-    });
-    localStorage.setItem("token", token);
-    await loadMe();
-  }
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const { token } = await api<{ token: string }>("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+      localStorage.setItem("token", token);
+      await loadMe();
+    },
+    [loadMe]
+  );
 
-  async function register(email: string, password: string, name?: string) {
-    const { token } = await api<{ token: string }>("/api/auth/register", {
-      method: "POST",
-      body: JSON.stringify({ email, password, name }),
-    });
-    localStorage.setItem("token", token);
-    await loadMe();
-  }
+  const register = useCallback(
+    async (email: string, password: string, name?: string) => {
+      const { token } = await api<{ token: string }>("/api/auth/register", {
+        method: "POST",
+        body: JSON.stringify({ email, password, name }),
+      });
+      localStorage.setItem("token", token);
+      await loadMe();
+    },
+    [loadMe]
+  );
 
-  function logout() {
+  const logout = useCallback(() => {
     localStorage.removeItem("token");
     setUser(null);
-  }
+  }, []);
 
-  const value = useMemo(() => ({ user, loading, login, register, logout }), [user, loading]);
+  const value = useMemo(
+    () => ({ user, loading, login, register, logout }),
+    [user, loading, login, register, logout]
+  );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
