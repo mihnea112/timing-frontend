@@ -49,7 +49,12 @@ export default function EventTimingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId]);
 
-  const latest = rows[0];
+  const liveRows = useMemo(
+    () => rows.filter((r) => r.stage !== null && r.racer_id !== null),
+    [rows]
+  );
+
+  const latest = liveRows[0];
 
   const formatTime = (ms: number) => {
     if (!ms) return "—";
@@ -277,14 +282,14 @@ export default function EventTimingPage() {
                   </div>
                 </div>
               ) : (
-                <div className="mt-2 text-neutral-400">No times yet.</div>
+                <div className="mt-2 text-neutral-400">No assigned times yet.</div>
               )}
             </div>
 
             <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-6">
               <div className="text-sm text-neutral-400 mb-3">Recent</div>
               <div className="space-y-2">
-                {rows.slice(0, 15).map((r) => (
+                {liveRows.slice(0, 15).map((r) => (
                   <div
                     key={r.id}
                     className="flex items-center justify-between border border-neutral-900 rounded-xl px-4 py-3"
