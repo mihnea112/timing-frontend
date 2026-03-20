@@ -18,6 +18,7 @@ const categories = [
   "Drift",
   "Rally Cross",
   "Juniori",
+  "Juniori +",
   "Feminin",
   "Eco-Karting",
   "Eco-Karting Juniori",
